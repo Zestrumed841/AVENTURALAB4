@@ -29,6 +29,13 @@ public:
 	FTimerHandle TimerEliminarPlataforma;
 	FTimerHandle TimerReposicionarPlataformas;
 
+	// Timer para crear plataformas cada 5 segundos
+	FTimerHandle TimerGenerarPlataformas;
+
 	void EliminarPlataforma();
 	void ReposicionarPlataformas();
+
+	// Genera plataformas aleatorias en las 3 areas
+	void GenerarPlataformas();
 };
+

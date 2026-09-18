@@ -38,6 +38,28 @@ public:
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float MoveSpeed;
 
+	// Si es true, permite moverse en todas las direcciones
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	bool bMovimientoLibre;
+
+	// Permitir movimientos específicos
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	bool bPermitirNorte;
+
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	bool bPermitirSur;
+
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	bool bPermitirEste;
+
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	bool bPermitirOeste;
+
+
+	// Permite que el Pawn gire hacia la direccion de movimiento
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	bool bRotarConMovimiento;
+
 	/** Sound to play each time we fire */
 	UPROPERTY(Category = Audio, EditAnywhere, BlueprintReadWrite)
 	class USoundBase* FireSound;
@@ -45,6 +67,18 @@ public:
 	// Begin Actor Interface
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+
+	// Detectar cuando el Paddle choca con algo                      para la destruccion del carril 2
+	UFUNCTION()
+	void OnHit(
+		UPrimitiveComponent* HitComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit
+	);
+
+
 	// End Actor Interface
 
 	/* Fire a shot in the specified direction */

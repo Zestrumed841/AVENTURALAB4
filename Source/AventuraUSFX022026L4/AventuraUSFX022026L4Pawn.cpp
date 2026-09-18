@@ -2,6 +2,8 @@
 
 #include "AventuraUSFX022026L4Pawn.h"
 #include "AventuraUSFX022026L4Projectile.h"
+#include "PlataformaIndestructible.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
@@ -19,13 +21,33 @@ const FName AAventuraUSFX022026L4Pawn::FireForwardBinding("FireForward");
 const FName AAventuraUSFX022026L4Pawn::FireRightBinding("FireRight");
 
 AAventuraUSFX022026L4Pawn::AAventuraUSFX022026L4Pawn()
-{	
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
-	// Create the mesh component
+{	// Mesh original de la nave
+// static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
+
+	// Mesh para el Paddle (cambio TwinStickUFO por Cube)
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(
+		TEXT("StaticMesh'/Game/StarterContent/Shapes/Shape_Cube.Shape_Cube'")
+	);
+
+
+
+	// Create the mesh component                               
 	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMeshComponent;
 	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
+
+	// Permitir detectar impactos del Paddle
+	ShipMeshComponent->SetNotifyRigidBodyCollision(true);
+
+	ShipMeshComponent->OnComponentHit.AddDynamic(
+		this,
+		&AAventuraUSFX022026L4Pawn::OnHit
+	);
+
+
+	// Dar forma rectangular al Paddle
+	ShipMeshComponent->SetRelativeScale3D(FVector(0.45f, 7.0f, 0.20f));
 	
 	// Cache our sound effect
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
@@ -46,6 +68,19 @@ AAventuraUSFX022026L4Pawn::AAventuraUSFX022026L4Pawn()
 
 	// Movement
 	MoveSpeed = 1000.0f;
+
+	// Configuracion inicial del movimiento
+	bMovimientoLibre = false;
+
+	// Para nuestro Paddle solo permitimos Este y Oeste
+	bPermitirNorte = false;
+	bPermitirSur = false;
+	bPermitirEste = true;
+	bPermitirOeste = true; 
+
+	// El Paddle no gira al moverse
+	bRotarConMovimiento = false;
+
 	// Weapon
 	GunOffset = FVector(90.f, 0.f, 0.f);
 	FireRate = 0.1f;
@@ -66,8 +101,37 @@ void AAventuraUSFX022026L4Pawn::SetupPlayerInputComponent(class UInputComponent*
 void AAventuraUSFX022026L4Pawn::Tick(float DeltaSeconds)
 {
 	// Find movement direction
-	const float ForwardValue = GetInputAxisValue(MoveForwardBinding);
-	const float RightValue = GetInputAxisValue(MoveRightBinding);
+	 float ForwardValue = GetInputAxisValue(MoveForwardBinding);
+	 float RightValue = GetInputAxisValue(MoveRightBinding);
+
+	 // Si NO esta activado el movimiento libre,
+// controlamos cada direccion por separado.
+	 if (!bMovimientoLibre)
+	 {
+		 // Norte
+		 if (ForwardValue > 0.0f && !bPermitirNorte)
+		 {
+			 ForwardValue = 0.0f;
+		 }
+
+		 // Sur
+		 if (ForwardValue < 0.0f && !bPermitirSur)
+		 {
+			 ForwardValue = 0.0f;
+		 }
+
+		 // Este
+		 if (RightValue > 0.0f && !bPermitirEste)
+		 {
+			 RightValue = 0.0f;
+		 }
+
+		 // Oeste
+		 if (RightValue < 0.0f && !bPermitirOeste)
+		 {
+			 RightValue = 0.0f;
+		 }
+	 }
 
 	// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
 	const FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
@@ -78,7 +142,13 @@ void AAventuraUSFX022026L4Pawn::Tick(float DeltaSeconds)
 	// If non-zero size, move this actor
 	if (Movement.SizeSquared() > 0.0f)
 	{
-		const FRotator NewRotation = Movement.Rotation();
+		FRotator NewRotation = GetActorRotation();
+
+		if (bRotarConMovimiento)
+		{
+			NewRotation = Movement.Rotation();
+		}
+
 		FHitResult Hit(1.f);
 		RootComponent->MoveComponent(Movement, NewRotation, true, &Hit);
 		
@@ -137,3 +207,25 @@ void AAventuraUSFX022026L4Pawn::ShotTimerExpired()
 	bCanFire = true;
 }
 
+void AAventuraUSFX022026L4Pawn::OnHit(
+	UPrimitiveComponent* HitComp,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse,
+	const FHitResult& Hit)
+{
+	if (OtherActor == nullptr)
+	{
+		return;
+	}
+
+	// Comprobar si el Paddle choco con una PlataformaIndestructible
+	APlataformaIndestructible* Plataforma =
+		Cast<APlataformaIndestructible>(OtherActor);
+
+	if (Plataforma != nullptr)
+	{
+		// El Paddle destruye solamente la Indestructible
+		Plataforma->Destroy();
+	}
+}
