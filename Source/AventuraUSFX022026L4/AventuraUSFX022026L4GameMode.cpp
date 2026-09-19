@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved.   
 
 #include "AventuraUSFX022026L4GameMode.h"
 #include "AventuraUSFX022026L4Pawn.h"
@@ -27,7 +27,7 @@ void AAventuraUSFX022026L4GameMode::BeginPlay()
 
 
 	UWorld* World = GetWorld();
-
+/*
 	SpawnLocation = FVector(-500.0f, 100.0f, 150.0f);
 	APlataforma* plataformaActual;
 
@@ -101,7 +101,7 @@ void AAventuraUSFX022026L4GameMode::BeginPlay()
 
 	}
 
-
+	*/
 	GetWorldTimerManager().SetTimer(TimerEliminarPlataforma, this, &AAventuraUSFX022026L4GameMode::EliminarPlataforma, 0.3 , true);
 	GetWorldTimerManager().SetTimer(TimerReposicionarPlataformas, this, &AAventuraUSFX022026L4GameMode::ReposicionarPlataformas, 5, false);
 	GetWorldTimerManager().SetTimer(TimerGenerarPlataformas,this,&AAventuraUSFX022026L4GameMode::GenerarPlataformas,5.0f,true);
@@ -203,19 +203,13 @@ void AAventuraUSFX022026L4GameMode::GenerarPlataformas()
 		{
 			// Crear PlataformaDestructible
 			PlataformaNueva =
-				World->SpawnActor<APlataformaDestructible>(
-					PosicionArea1,
-					Rotacion
-				);
+				World->SpawnActor<APlataformaDestructible>(PosicionArea1,Rotacion);
 		}
 		else
 		{
 			// Crear PlataformaIndestructible
 			PlataformaNueva =
-				World->SpawnActor<APlataformaIndestructible>(
-					PosicionArea1,
-					Rotacion
-				);
+				World->SpawnActor<APlataformaIndestructible>(PosicionArea1,Rotacion);
 		}
 
 		// Dar el mismo tamaño a las dos

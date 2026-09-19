@@ -5,6 +5,7 @@
 #include "AventuraUSFX022026L4Pawn.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/StaticMesh.h"
+#include "Materials/MaterialInterface.h"
 
 
 APlataformaIndestructible::APlataformaIndestructible()
@@ -17,6 +18,16 @@ APlataformaIndestructible::APlataformaIndestructible()
 	if (MeshIndestructible.Succeeded())
 	{
 		mallaPlataforma->SetStaticMesh(MeshIndestructible.Object);
+	}
+
+	// Material de la plataforma indestructible                           cambio de color	
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialIndestructible(
+		TEXT("Material'/Game/cube.cube'")
+	);
+
+	if (MaterialIndestructible.Succeeded())
+	{
+		mallaPlataforma->SetMaterial(0, MaterialIndestructible.Object);
 	}
 
 	// Tamaño de la plataforma

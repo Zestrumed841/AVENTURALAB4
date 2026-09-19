@@ -25,7 +25,7 @@ AAventuraUSFX022026L4Projectile::AAventuraUSFX022026L4Projectile()
 	ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
 
 	// Tamaño de la pelota
-	ProjectileMesh->SetRelativeScale3D(FVector(0.35f, 0.35f, 0.35f));
+	ProjectileMesh->SetRelativeScale3D(FVector(0.60f, 0.60f, 0.60f));
 
 
 	ProjectileMesh->SetupAttachment(RootComponent);

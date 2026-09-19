@@ -5,6 +5,7 @@
 #include "AventuraUSFX022026L4Projectile.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/StaticMesh.h"
+#include "Materials/MaterialInterface.h"
 
 
 
@@ -18,6 +19,16 @@ APlataformaDestructible::APlataformaDestructible()
 	if (MeshDestructible.Succeeded())
 	{
 		mallaPlataforma->SetStaticMesh(MeshDestructible.Object);
+	}
+
+	// Material rojo para distinguir la plataforma destructible
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialDestructible(
+		TEXT("Material'/Game/M_Destructible.M_Destructible'")
+	);
+
+	if (MaterialDestructible.Succeeded())
+	{
+		mallaPlataforma->SetMaterial(0, MaterialDestructible.Object);
 	}
 
 	// Tamaño de la plataforma                               tamaño 

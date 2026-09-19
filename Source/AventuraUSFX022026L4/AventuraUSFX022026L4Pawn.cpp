@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved. si se preguntn porque la plataforma del carril 3 nose destruye es porque primero se debe destrir de frente con el paw para q desaparesaca y luego todo sera normal
 
 #include "AventuraUSFX022026L4Pawn.h"
 #include "AventuraUSFX022026L4Projectile.h"
@@ -225,7 +225,7 @@ void AAventuraUSFX022026L4Pawn::OnHit(
 
 	if (Plataforma != nullptr)
 	{
-		// El Paddle destruye solamente la Indestructible
+		// El Paddle destruye solamente la Indestructible ...
 		Plataforma->Destroy();
 	}
 }
